@@ -3,9 +3,9 @@
 This is a port of my Placid plugin that I built for Craft, it doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates
 
 Placid (Statamic) supports:
-— Caching/Refreshing
-— Template variable pairs
-— Predefined requests
+ - Caching/Refreshing
+ - Template variable pairs
+ - Predefined requests
 
 ## Usage
 
