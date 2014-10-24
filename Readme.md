@@ -6,7 +6,6 @@ Placid (Statamic) supports:
  - Caching/Refreshing
  - Template variable pairs
  - Predefined requests
- - Query parameters
 
 ## Usage
 
@@ -34,17 +33,17 @@ You can catch when there are no results just like you would in an entries loop:
 
 	{{ placid url=“http://www.dustysquirrels.com/noapi” }}
 		{{ if no_results }}
-				No results
+			No results
 		{{ else }}
-				Squirrels!
+			Squirrels!
 		{{ endif }}
 	{{ /placid }}
 
 ### Parameters
-**URL**: The URL to request
-**refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
-**handle** (string) : The handle specified in the placid config
-**cache** (boolean) : Whether you want the request to be cached (default is true)
+- **URL**: The URL to request
+- **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
+- **handle** (string) : The handle specified in the placid config
+- **cache** (boolean) : Whether you want the request to be cached (default is true)
 
 ### Config file
 You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
