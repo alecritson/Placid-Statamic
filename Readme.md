@@ -7,6 +7,29 @@ Placid (Statamic) supports:
  - Template variable pairs
  - Predefined requests
 
+### Installation
+Copy the placid folder to your **_add-ons** directory and you're good to go
+
+### Parameters
+- **URL**: The URL to request
+- **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
+- **handle** (string) : The handle specified in the placid config
+- **cache** (boolean) : Whether you want the request to be cached (default is true)
+
+### Saved requests
+You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
+
+	dribbble:
+		url: 'http://api.dribbble.com/shots/everyone'
+		cache: true
+
+	weather_api:
+		url: 'http://api.openweathermap.org/data/2.5/weather'
+		query:
+			q: 'London,uk'
+
+*The query array works out as ‘q=London,uk’ in the url*
+
 ## Usage
 
 To use this plugin in your templates, simply use these tags:
@@ -38,26 +61,6 @@ You can catch when there are no results just like you would in an entries loop:
 			Squirrels!
 		{{ endif }}
 	{{ /placid }}
-
-### Parameters
-- **URL**: The URL to request
-- **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
-- **handle** (string) : The handle specified in the placid config
-- **cache** (boolean) : Whether you want the request to be cached (default is true)
-
-### Config file
-You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
-
-	dribbble:
-		url: 'http://api.dribbble.com/shots/everyone'
-		cache: true
-
-	weather_api:
-		url: 'http://api.openweathermap.org/data/2.5/weather'
-		query:
-			q: 'London,uk'
-
-*The query array works out as ‘q=London,uk’ in the url*
-
+	
 ## Support,issues,feedback
 If you want to leave feedback about this project, feel free to get in touch on [twitter](http://www.twitter.com/alecritson) if you experience any issues please just create a new issue here on the Repo
