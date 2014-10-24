@@ -4,7 +4,7 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.5.5',
+		'version' => '0.5.7',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
@@ -12,29 +12,27 @@ class Plugin_placid extends Plugin {
 
 	public function index()
 	{	
-		// Get the record and url
+		// Get the request
 		// -------------------------------------------------------
 
-		$handle = $this->fetchParam('handle', NULL, NULL, FALSE, FALSE);
-		$cache = $this->fetchParam('cache', TRUE, NULL, TRUE, TRUE);
+		$handle = $this->fetchParam('handle', null, null, false, false);
 		$request = $this->fetch($handle) ?: null;
-		$query = isset($request['query']) ? $request['query'] : null;
-		$cache_length = $this->fetchParam('refresh', 7200);
-
+		
 		// Set our options
 		// ---------------------------------------------------------
-		$options['cache'] = $cache;
+		$options = array(
+			'cache' => (bool) $this->_getOption( $request, 'cache', true, null, true, true),
+			'cache_length' => $this->_getOption( $request, 'refresh', 3200)
+		);
 
-
-		$url = $this->_getUrl($request);
-
-
-		// If there is no URL
-		if( !$url ) {
+		// If there is no url specified, return (figure out why throw exception wasnt working...)
+		if( ! $url = $this->_getUrl($request) ) {
 			return 'Invalid or missing URL';
 		}
 
-		// If there is a query string in the config, get it and add it to the url
+		// If there is a query string in the request, get it and add it to the url
+		$query = isset($request['query']) ? $request['query'] : null;
+
 		if($query) {
 			$queryString = $this->_buildQueryString($query);
 			$url .= '?' . $queryString;
@@ -43,24 +41,36 @@ class Plugin_placid extends Plugin {
 		// Do the cache thing
 		// ---------------------------------------------------------
 
-		// First, check if there is already a cache of the url
-		$cached_id = base64_encode(urlencode($url));
-		$cached_response = $this->cache->getYAML($cached_id);
-
-		if($cached_response)
+		if($options['cache'])
 		{
-			// If the cache is older than we want, delete it.
-			if($this->cache->getAge($cached_id) >= $cache_length)
-			{
-				$this->cache->delete($cached_id);
-			}
-			else {
-				return $cached_response;
+
+			// Set up the cached_id
+			$cached_id = base64_encode(urlencode($url));
+
+			// Try and get a cached response
+			$cached_response = $this->cache->getYAML($cached_id);
+
+			if($cached_response)
+			{	
+				// If the cache is older than we want, delete it.
+				if($this->cache->getAge($cached_id) >= $options['cache_length'])
+				{
+					$this->cache->delete($cached_id);
+				}
+				else {
+					return $cached_response;
+				}
 			}
 		}
-			
-		
 
+		// Make the call
+		// -----------------------------------------------------------
+		// Needs improving:
+		// 	- Be able to send headers?
+		//	- Content type?
+		//	- Authorisation?
+		//	- What happens if it's not json?
+		// -----------------------------------------------------------
 		$result = $this->_get($url, $options);
 
 		if( $result ) {
@@ -109,24 +119,32 @@ class Plugin_placid extends Plugin {
 			CURLOPT_HEADER => false,
 			CURLOPT_RETURNTRANSFER => true,
 		);
-		
 		// Initialise the curl request
 		$data = curl_init();
 		curl_setopt_array($data, $config);
-		$json = curl_exec($data);
+		$response = curl_exec($data);
+		$status = curl_getinfo($data);
 		curl_close($data);
 
-		// Print the result
-		$response = json_decode($json, true);
+		switch ($status['content_type']) {
+			default:
+				$content = json_decode($response, true);
+				break;
+		}
 
 		if($options['cache']) {	
 			$cacheId = base64_encode(urlencode($url));
-			$this->cache->putYAML($cacheId, $response);
+			$this->cache->putYAML($cacheId, $content);
 		}
 
-		return $response;
+		return $content;
 	}
 
+
+	private function _getOption($request, $id, $default=NULL, $validity_check=NULL, $is_boolean=FALSE, $force_lower=TRUE)
+	{
+		return isset($request[$id]) ? $request[$id] : $this->fetchParam($id, $default, $validity_check, $is_boolean, $force_lower);
+	}
 	private function _buildQueryString($array)
 	{
 		// Lets build the query
