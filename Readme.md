@@ -7,6 +7,11 @@ Placid (Statamic) supports:
  - Template variable pairs
  - Predefined requests
 
+ #### Updates / Changes
+
+ - **Version 0.5.7** - Fixed issue where cache would take effect even if set to false in config
+ - **Version 0.5.5** - Initial release
+	
 ### Installation
 Copy the placid folder to your **_add-ons** directory and you're good to go
 
@@ -22,6 +27,7 @@ You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
 	dribbble:
 		url: 'http://api.dribbble.com/shots/everyone'
 		cache: true
+		refresh: 60
 
 	weather_api:
 		url: 'http://api.openweathermap.org/data/2.5/weather'
@@ -61,6 +67,6 @@ You can catch when there are no results just like you would in an entries loop:
 			Squirrels!
 		{{ endif }}
 	{{ /placid }}
-	
+
 ## Support,issues,feedback
 If you want to leave feedback about this project, feel free to get in touch on [twitter](http://www.twitter.com/alecritson) if you experience any issues please just create a new issue here on the Repo
