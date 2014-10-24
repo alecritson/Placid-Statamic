@@ -7,7 +7,7 @@ class Plugin_placid extends Plugin {
 		'version' => '0.5.7',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
-	);
+		);
 	var $options = array();
 
 	public function index()
@@ -23,7 +23,7 @@ class Plugin_placid extends Plugin {
 		$options = array(
 			'cache' => (bool) $this->_getOption( $request, 'cache', true, null, true, true),
 			'cache_length' => $this->_getOption( $request, 'refresh', 3200)
-		);
+			);
 
 		// If there is no url specified, return (figure out why throw exception wasnt working...)
 		if( ! $url = $this->_getUrl($request) ) {
@@ -118,7 +118,7 @@ class Plugin_placid extends Plugin {
 			CURLOPT_URL => $url,
 			CURLOPT_HEADER => false,
 			CURLOPT_RETURNTRANSFER => true,
-		);
+			);
 		// Initialise the curl request
 		$data = curl_init();
 		curl_setopt_array($data, $config);
@@ -128,8 +128,8 @@ class Plugin_placid extends Plugin {
 
 		switch ($status['content_type']) {
 			default:
-				$content = json_decode($response, true);
-				break;
+			$content = json_decode($response, true);
+			break;
 		}
 
 		if($options['cache']) {	
