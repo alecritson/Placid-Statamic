@@ -1,14 +1,19 @@
 # Placid Beta (Statamic)
+~~ This is a port of my Placid plugin that I built for Craft.It doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates~~
 
-This is a port of my Placid plugin that I built for Craft, it doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates
+Placid allows you to consume RESTful APIs in your Statamic templates, using Guzzle to handle the requests. 
 
 Placid (Statamic) supports:
  - Caching/Refreshing
  - Template variable pairs
  - Predefined requests
+ - Headers
+ - Access tokens
 
  #### Updates / Changes
-
+ - **Version 0.8.0** - Added support for headers to be sent from the config
+ - **Version 0.7.0** - Added support for access tokens in the config
+ - **Version 0.6.0** - Guzzle is now being used instead of cURL
  - **Version 0.5.7** - Fixed issue where cache would take effect even if set to false in config
  - **Version 0.5.5** - Initial release
 	
@@ -20,6 +25,7 @@ Copy the placid folder to your **_add-ons** directory and you're good to go
 - **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
 - **handle** (string) : The handle specified in the placid config
 - **cache** (boolean) : Whether you want the request to be cached (default is true)
+- **method** (string) : You can set which method to use on the request, default is 'GET' 
 
 ### Saved requests
 You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
@@ -34,8 +40,15 @@ You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
 		query:
 			q: 'London,uk'
 
+	github:
+		url: 'https://api.github.com/repos/alecritson/Placid-Statamic'
+		access_token: OAUTH-TOKEN
+		headers:
+			Authorization: token OAUTH-TOKEN
+
 *The query array works out as ‘q=London,uk’ in the url*
 
+**If you use `access_token` it will be appended to the url, if you use the `headers` array then it will be sent through the request headers.**
 ## Usage
 
 To use this plugin in your templates, simply use these tags:

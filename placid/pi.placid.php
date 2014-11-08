@@ -1,13 +1,17 @@
 <?php
 
+require 'vendor/autoload.php';
+
+use GuzzleHttp\Client;
+
 class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.5.7',
+		'version' => '0.8.0',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
-		);
+	);
 	var $options = array();
 
 	public function index()
@@ -17,13 +21,17 @@ class Plugin_placid extends Plugin {
 
 		$handle = $this->fetchParam('handle', null, null, false, false);
 		$request = $this->fetch($handle) ?: null;
-		
+
 		// Set our options
 		// ---------------------------------------------------------
 		$options = array(
 			'cache' => (bool) $this->_getOption( $request, 'cache', true, null, true, true),
-			'cache_length' => $this->_getOption( $request, 'refresh', 3200)
-			);
+			'cache_length' => $this->_getOption( $request, 'refresh', 3200),
+			'method' => $this->_getOption($request, 'method', 'GET'),
+			'access_token' => $this->_getOption($request, 'access_token'),
+			'query' => isset($request['query']) ? $request['query'] : null,
+			'headers' => isset($request['headers']) ? $request['headers'] : null
+		);
 
 		// If there is no url specified, return (figure out why throw exception wasnt working...)
 		if( ! $url = $this->_getUrl($request) ) {
@@ -31,19 +39,11 @@ class Plugin_placid extends Plugin {
 		}
 
 		// If there is a query string in the request, get it and add it to the url
-		$query = isset($request['query']) ? $request['query'] : null;
-
-		if($query) {
-			$queryString = $this->_buildQueryString($query);
-			$url .= '?' . $queryString;
-		} 
 
 		// Do the cache thing
 		// ---------------------------------------------------------
-
 		if($options['cache'])
 		{
-
 			// Set up the cached_id
 			$cached_id = base64_encode(urlencode($url));
 
@@ -71,8 +71,43 @@ class Plugin_placid extends Plugin {
 		//	- Authorisation?
 		//	- What happens if it's not json?
 		// -----------------------------------------------------------
-		$result = $this->_get($url, $options);
 
+		$client = new Client();
+
+		$request = $client->createRequest($options['method'], $url);
+
+		$query = $request->getQuery();
+
+		if($options['query'])
+		{
+
+			foreach ($options['query'] as $key => $value)
+			{
+				$query->set($key, $value);
+			}
+		}
+
+		if($options['headers'])
+		{
+			foreach ($options['headers'] as $key => $value)
+			{
+				$request->setHeader($key, $value);
+			}
+		}
+
+		if($options['access_token'])
+		{
+			$query->set('access_token', $options['access_token']);
+		}
+		
+		$response = $client->send($request);
+		$result = $response->json();
+
+		if($options['cache']) {	
+			$cacheId = base64_encode(urlencode($url));
+			$this->cache->putYAML($cacheId, $result);
+		}
+		$result = null;
 		if( $result ) {
 			return $result;
 		} else {
@@ -104,51 +139,8 @@ class Plugin_placid extends Plugin {
 		return $url;
 	}
 
-	/**
-    * Make the request
-    *                                   
-    * @param array|null      $record     The record array from config
-    *
-    * @return string   The url to request, null is empty
-    */
-	private function _get($url, $options = null, $method = 'get', $headers = null, $postFields = null)
-	{
-		
-		$config = array(
-			CURLOPT_URL => $url,
-			CURLOPT_HEADER => false,
-			CURLOPT_RETURNTRANSFER => true,
-			);
-		// Initialise the curl request
-		$data = curl_init();
-		curl_setopt_array($data, $config);
-		$response = curl_exec($data);
-		$status = curl_getinfo($data);
-		curl_close($data);
-
-		switch ($status['content_type']) {
-			default:
-			$content = json_decode($response, true);
-			break;
-		}
-
-		if($options['cache']) {	
-			$cacheId = base64_encode(urlencode($url));
-			$this->cache->putYAML($cacheId, $content);
-		}
-
-		return $content;
-	}
-
-
 	private function _getOption($request, $id, $default=NULL, $validity_check=NULL, $is_boolean=FALSE, $force_lower=TRUE)
 	{
 		return isset($request[$id]) ? $request[$id] : $this->fetchParam($id, $default, $validity_check, $is_boolean, $force_lower);
-	}
-	private function _buildQueryString($array)
-	{
-		// Lets build the query
-		$query = http_build_query($array, '', '&');
-		return $query;
 	}
 }
