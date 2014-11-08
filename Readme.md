@@ -1,5 +1,5 @@
 # Placid Beta (Statamic)
-~~ This is a port of my Placid plugin that I built for Craft.It doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates~~
+~~This is a port of my Placid plugin that I built for Craft.It doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates~~
 
 Placid allows you to consume RESTful APIs in your Statamic templates, using Guzzle to handle the requests. 
 
