@@ -1,21 +1,20 @@
 # Placid Beta (Statamic)
-~~This is a port of my Placid plugin that I built for Craft.It doesn’t have all the same features yet but you can consume any **open** API in your Statamic templates~~
 
 Placid allows you to consume RESTful APIs in your Statamic templates, using Guzzle to handle the requests. 
 
-Placid (Statamic) supports:
- - Caching/Refreshing
- - Template variable pairs
- - Predefined requests
- - Headers
- - Access tokens
-
- #### Updates / Changes
- - **Version 0.8.0** - Added support for headers to be sent from the config
- - **Version 0.7.0** - Added support for access tokens in the config
- - **Version 0.6.0** - Guzzle is now being used instead of cURL
- - **Version 0.5.7** - Fixed issue where cache would take effect even if set to false in config
- - **Version 0.5.5** - Initial release
+**Placid supports**:
+- Caching/Refreshing
+- Template variable pairs
+- Predefined requests
+- Headers
+- Access tokens
+ 
+#### Updates / Changes  
+- **Version 0.8.0** - Added support for headers to be sent from the config
+- **Version 0.7.0** - Added support for access tokens in the config
+- **Version 0.6.0** - Guzzle is now being used instead of cURL
+- **Version 0.5.7** - Fixed issue where cache would take effect even if set to false in config
+- **Version 0.5.5** - Initial release
 	
 ### Installation
 Copy the placid folder to your **_add-ons** directory and you're good to go
