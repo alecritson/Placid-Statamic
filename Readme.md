@@ -48,7 +48,7 @@ You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
 		headers:
 			Authorization: token OAUTH-TOKEN
 
-*The query array works out as ‘q=London,uk’ in the url*
+The query array works out as `q=London,uk` in the url
 
 **If you use `access_token` it will be appended to the url, if you use the `headers` array then it will be sent through the request headers.**
 ## Usage
