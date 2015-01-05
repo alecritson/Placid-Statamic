@@ -54,14 +54,14 @@ To use this plugin in your templates, simply use these tags:
 
 ### Example Code Block with manual URL
  
-	{{ placid url=“http://api.dribbble.com/shots/everyone” }}
+	{{ placid url="http://api.dribbble.com/shots/everyone" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
 	{{ /placid }}
 
 ### Example code block with handle
-	{{ placid handle=“dribbble” }}
+	{{ placid handle="dribbble" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
@@ -72,7 +72,7 @@ To use this plugin in your templates, simply use these tags:
 ### Handling no results
 You can catch when there are no results just like you would in an entries loop:
 
-	{{ placid url=“http://www.dustysquirrels.com/noapi” }}
+	{{ placid url="http://www.dustysquirrels.com/noapi" }}
 		{{ if no_results }}
 			No results
 		{{ else }}
