@@ -9,12 +9,14 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Headers
 - Access tokens
  
-#### Updates / Changes  
-- **Version 0.8.0** - Added support for headers to be sent from the config
-- **Version 0.7.0** - Added support for access tokens in the config
-- **Version 0.6.0** - Guzzle is now being used instead of cURL
-- **Version 0.5.7** - Fixed issue where cache would take effect even if set to false in config
-- **Version 0.5.5** - Initial release
+#### Updates / Changes
+- **v0.8.9** - Fixes and added query parameter
+- **v0.8.7** - Bug fixes
+- **v0.8** - Added support for headers to be sent from the config
+- **v0.7** - Added support for access tokens in the config
+- **v0.6** - Guzzle is now being used instead of cURL
+- **v0.5.7** - Fixed issue where cache would take effect even if set to false in config
+- **v0.5.5** - Initial release
 	
 ### Installation
 Copy the placid folder to your **_add-ons** directory and you're good to go
