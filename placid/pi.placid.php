@@ -8,7 +8,7 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.8.5',
+		'version' => '0.8.9',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
@@ -22,7 +22,6 @@ class Plugin_placid extends Plugin {
 		$handle = $this->fetchParam('handle', null, null, false, false);
 		$request = $this->fetch($handle) ? $this->fetch($handle) : null;
 
-		
 		// Set our options
 		// ---------------------------------------------------------
 		$options = array(
@@ -30,11 +29,26 @@ class Plugin_placid extends Plugin {
 			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', 3200),
 			'method'		=>	$this->_getOption($request, 'method', 'GET'),
 			'access_token'	=>	$this->_getOption($request, 'access_token'),
-			'query'			=>	$this->_getOption($request, 'query', null),
+			'query'			=>	$this->_getOption($request, 'query'),
 			'headers'		=>	$this->_getOption($request, 'headers', null)
 		);
 
-		
+		if($options['query'] && !$request)
+		{
+			// Get the query parameter as a string and explode it.
+			$queries = explode(',', $this->fetchParam('query'));
+
+			// Make sure this is a clean array.
+			$options['query'] = array();
+
+			// Map each query from the exploded array into a variable
+			// Then add them to the query array
+			foreach($queries as $query)
+			{
+				list($key, $value) = explode(':', $query);
+				$options['query'][$key] = $value;
+			}
+		}
 
 		// If there is no url specified, return (figure out why throw exception wasnt working...)
 		if( ! $url = $this->_getUrl($request) ) {
@@ -59,9 +73,9 @@ class Plugin_placid extends Plugin {
 				if($this->cache->getAge($cached_id) >= $options['cache_length'])
 				{
 					$this->cache->delete($cached_id);
-
 				}
-				else {
+				else
+				{
 					return $cached_response;
 				}
 			}
@@ -102,7 +116,7 @@ class Plugin_placid extends Plugin {
 		{
 			$query->set('access_token', $options['access_token']);
 		}
-		
+	
 		$response = $client->send($request);
 		$result = $response->json();
 
@@ -111,12 +125,11 @@ class Plugin_placid extends Plugin {
 			$this->cache->putYAML($cacheId, $result);
 		}
 
-		if( $result ) {
-			return $result;
-		} else {
+		if(!$result) {
 			return Parse::template($this->content, array('no_results' => true));
 		}
-		
+
+		return $result;
 	}
 
 	/**
