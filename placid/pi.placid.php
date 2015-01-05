@@ -8,7 +8,7 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.8.0',
+		'version' => '0.8.5',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
@@ -20,18 +20,21 @@ class Plugin_placid extends Plugin {
 		// -------------------------------------------------------
 
 		$handle = $this->fetchParam('handle', null, null, false, false);
-		$request = $this->fetch($handle) ?: null;
+		$request = $this->fetch($handle) ? $this->fetch($handle) : null;
 
+		
 		// Set our options
 		// ---------------------------------------------------------
 		$options = array(
-			'cache' => (bool) $this->_getOption( $request, 'cache', true, null, true, true),
-			'cache_length' => $this->_getOption( $request, 'refresh', 3200),
-			'method' => $this->_getOption($request, 'method', 'GET'),
-			'access_token' => $this->_getOption($request, 'access_token'),
-			'query' => isset($request['query']) ? $request['query'] : null,
-			'headers' => isset($request['headers']) ? $request['headers'] : null
+			'cache'			=>	(bool) $this->_getOption($request, 'cache', true, null, true, true),
+			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', 3200),
+			'method'		=>	$this->_getOption($request, 'method', 'GET'),
+			'access_token'	=>	$this->_getOption($request, 'access_token'),
+			'query'			=>	$this->_getOption($request, 'query', null),
+			'headers'		=>	$this->_getOption($request, 'headers', null)
 		);
+
+		
 
 		// If there is no url specified, return (figure out why throw exception wasnt working...)
 		if( ! $url = $this->_getUrl($request) ) {
@@ -56,6 +59,7 @@ class Plugin_placid extends Plugin {
 				if($this->cache->getAge($cached_id) >= $options['cache_length'])
 				{
 					$this->cache->delete($cached_id);
+
 				}
 				else {
 					return $cached_response;
@@ -80,7 +84,6 @@ class Plugin_placid extends Plugin {
 
 		if($options['query'])
 		{
-
 			foreach ($options['query'] as $key => $value)
 			{
 				$query->set($key, $value);
@@ -107,7 +110,7 @@ class Plugin_placid extends Plugin {
 			$cacheId = base64_encode(urlencode($url));
 			$this->cache->putYAML($cacheId, $result);
 		}
-		$result = null;
+
 		if( $result ) {
 			return $result;
 		} else {
@@ -127,7 +130,7 @@ class Plugin_placid extends Plugin {
 
 		if($record) {
 			// Does the request have a url?
-			if( $record['url'] ) {
+			if( array_key_exists('url', $record) ) {
 				$url = $record['url'];
 			} else {
 				$url = null;
