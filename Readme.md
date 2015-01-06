@@ -10,6 +10,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Access tokens
  
 #### Updates / Changes
+- **v0.9.2** - Refactoring and added [API](#api) methods
 - **v0.9** - Bug fixes, refactoring, added [default](#defaults) config and reusable [access tokens](#access_tokens)
 - **v0.8.9** - Bug fixes, refactoring and added [query](#queries) parameter
 - **v0.8.7** - Bug fixes
@@ -111,6 +112,21 @@ You can catch when there are no results just like you would in an entries loop:
 			Squirrels!
 		{{ endif }}
 	{{ /placid }}
+
+## API
+You can utilize Placid in your own plugins via the Statamic plugin API.
+
+### Request 
+
+	$request = $this->addon->api('placid')->request($url)
+	
+This will return a `GuzzleHttp\Message\Request Object` which you can interact with, read the [Guzzle docs](http://guzzle.readthedocs.org/en/latest/http-messages.html#requests) for more info. If you need a different method to `GET` then just pass it in the second parameter.
+
+### Send  
+
+	$response = $this->addon->api('placid')->send($request)
+	
+This will send the request and return a `GuzzleHttp\Message\Response Object`, again you can interact with this but if you just want to get the response content you could just do `$response->json()`, check the [Guzzle docs](http://guzzle.readthedocs.org/en/latest/http-messages.html#responses) for more info.
 
 ## Support,issues,feedback
 If you want to leave feedback about this project, feel free to get in touch on [twitter](http://www.twitter.com/alecritson) if you experience any issues please just create a new issue here on the Repo
