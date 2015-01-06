@@ -73,7 +73,7 @@ To use this plugin in your templates, simply use these tags:
 
 ### Example Code Block with manual URL
  
-	{{ placid url="http://api.dribbble.com/shots/everyone" }}
+	{{ placid url="http://api.dribbble.com/shots/everyone" cache="false" refresh="1200" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
