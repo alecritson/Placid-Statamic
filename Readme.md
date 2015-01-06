@@ -10,10 +10,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Access tokens
  
 #### Updates / Changes
-<<<<<<< HEAD
 - **v0.9** - Bug fixes, refactoring, added [default](#defaults) config and reusable [access tokens](#access_tokens)
-=======
->>>>>>> FETCH_HEAD
 - **v0.8.9** - Bug fixes, refactoring and added [query](#queries) parameter
 - **v0.8.7** - Bug fixes
 - **v0.8** - Added support for headers to be sent from the config
@@ -32,10 +29,7 @@ Copy the placid folder to your **_add-ons** directory and you're good to go
 - **cache** (boolean) : Whether you want the request to be cached (default is true)
 - **method** (string) : You can set which method to use on the request, default is 'GET' 
 - **query** (string)  : Add your queries here, see [queries](#queries) for more info
-<<<<<<< HEAD
 
-=======
->>>>>>> FETCH_HEAD
 
 ### Saved requests
 You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
@@ -101,15 +95,12 @@ You can add queries to the request from the template using a `key:value` pattern
 
 which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
 
-<<<<<<< HEAD
 ### Tokens
 To reuse access tokens that are stored in your config simply add the `access_token` parameter with the name of the token you want from `placid_tokens` in the placid config file
 
 	{{ placid handle="githubRepo" access_token="github" }}
 	{{ /placid }}	
 
-=======
->>>>>>> FETCH_HEAD
 ### Handling no results
 You can catch when there are no results just like you would in an entries loop:
 
