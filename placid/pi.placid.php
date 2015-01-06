@@ -1,9 +1,5 @@
 <?php
 
-require 'vendor/autoload.php';
-
-use GuzzleHttp\Client;
-
 class Plugin_placid extends Plugin {
 
 	var $meta = array(
@@ -15,7 +11,7 @@ class Plugin_placid extends Plugin {
 	var $options = array();
 
 	public function index()
-	{	
+	{			
 		// Get the request
 		// -------------------------------------------------------
 
@@ -26,13 +22,15 @@ class Plugin_placid extends Plugin {
 		// ---------------------------------------------------------
 		$options = array(
 			'cache'			=>	(bool) $this->_getOption($request, 'cache', true, null, true, true),
-			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', 3200),
+			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', $this->fetch('placid_defaults')['refresh'] ?: 3200),
 			'method'		=>	$this->_getOption($request, 'method', 'GET'),
 			'access_token'	=>	$this->_getOption($request, 'access_token'),
 			'query'			=>	$this->_getOption($request, 'query'),
 			'headers'		=>	$this->_getOption($request, 'headers', null)
 		);
 
+		// We only want to try and explode the query if it's been set as a parameter,
+		// not when there is a record.
 		if($options['query'] && !$request)
 		{
 			// Get the query parameter as a string and explode it.
@@ -54,8 +52,6 @@ class Plugin_placid extends Plugin {
 		if( ! $url = $this->_getUrl($request) ) {
 			return 'Invalid or missing URL';
 		}
-
-		// If there is a query string in the request, get it and add it to the url
 
 		// Do the cache thing
 		// ---------------------------------------------------------
@@ -81,22 +77,28 @@ class Plugin_placid extends Plugin {
 			}
 		}
 
-		// Make the call
-		// -----------------------------------------------------------
-		// Needs improving:
-		// 	- Be able to send headers?
-		//	- Content type?
-		//	- Authorisation?
-		//	- What happens if it's not json?
-		// -----------------------------------------------------------
+		// If an access token is set and there is no request we need to make sure the token exists in the config too.
+		if($options['access_token'] && !$request)
+		{
+			// Try and get the token from the config
+			try {
+				$token = $this->fetch('placid_tokens')[$options['access_token']];
+			} catch(Exception $e)
+			{
+				// Log needs to go here
+				$token = null;
+			}
+			$options['access_token'] = $token;
+		}
+			
+		// Get the request object from the tasks
+		$request = $this->tasks->client()->request($options['method'], $url);
 
-		$client = new Client();
-
-		$request = $client->createRequest($options['method'], $url);
-
+		// Grab the query from the request
 		$query = $request->getQuery();
 
-		if($options['query'])
+		// Only do this if the query is an array
+		if($options['query'] && is_array($options['query']))
 		{
 			foreach ($options['query'] as $key => $value)
 			{
@@ -104,7 +106,8 @@ class Plugin_placid extends Plugin {
 			}
 		}
 
-		if($options['headers'])
+		// Do headers exist and is it an array?
+		if($options['headers'] && is_array($options['headers']))
 		{
 			foreach ($options['headers'] as $key => $value)
 			{
@@ -112,23 +115,42 @@ class Plugin_placid extends Plugin {
 			}
 		}
 
+		// Do we have an access token we need to append?
 		if($options['access_token'])
 		{
 			$query->set('access_token', $options['access_token']);
 		}
-	
-		$response = $client->send($request);
-		$result = $response->json();
 
+		/**
+		*	Try and get the response
+		*
+		*	TODO:
+		*	- Create a log if something goes wrong, at the mo Log::warn($e->getMessage(), $meta['name'], $meta['version']) isn't working :(
+		*
+		**/
+		try
+		{
+			$response = $this->tasks->client()->send($request);
+			$result = $response->json();
+
+		} catch(\Exception  $e)
+		{
+			// If an exception is thrown we set the result to null, this will help with the 'no_results' tag
+			// The error log bit should go here
+			$result = null;
+		}
+
+		// Do we need to cache the request?
 		if($options['cache']) {	
 			$cacheId = base64_encode(urlencode($url));
 			$this->cache->putYAML($cacheId, $result);
 		}
 
+		// If there is no result, pass the `no_results` tag back
 		if(!$result) {
 			return Parse::template($this->content, array('no_results' => true));
 		}
-
+	
 		return $result;
 	}
 
@@ -137,7 +159,7 @@ class Plugin_placid extends Plugin {
     *                                   
     * @param array|null      $record     The record array from config
     *
-    * @return string   The url to request, null is empty
+    * @return string   The url to request, null if empty
     */
 	private function _getUrl($record) {
 
