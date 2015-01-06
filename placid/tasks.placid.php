@@ -23,7 +23,6 @@ class Tasks_placid extends Tasks
 		
 		return $this;
 	}
-
 	/**
 	*
 	* Create a request with the client
@@ -34,7 +33,7 @@ class Tasks_placid extends Tasks
 	* @return GuzzleHttp\Message\Request Object
 	**/
 	
-	public function request($method = 'GET', $url)
+	public function request($url, $method = 'GET')
 	{
 		$this->request = $this->client->createRequest($method, $url);
 

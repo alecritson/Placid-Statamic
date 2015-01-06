@@ -4,7 +4,7 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.8.9',
+		'version' => '0.9.2',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
@@ -92,7 +92,7 @@ class Plugin_placid extends Plugin {
 		}
 			
 		// Get the request object from the tasks
-		$request = $this->tasks->client()->request($options['method'], $url);
+		$request = $this->tasks->client()->request($url, $options['method']);
 
 		// Grab the query from the request
 		$query = $request->getQuery();
