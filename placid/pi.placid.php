@@ -9,6 +9,7 @@ class Plugin_placid extends Plugin {
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
 	var $options = array();
+	var $curlOpts = array();
 
 	public function index()
 	{			
@@ -16,7 +17,8 @@ class Plugin_placid extends Plugin {
 		// -------------------------------------------------------
 
 		$handle = $this->fetchParam('handle', null, null, false, false);
-		$request = $this->fetch($handle) ? $this->fetch($handle) : null;
+		$request = $this->fetch($handle, null, null, false, false);
+
 
 		// Set our options
 		// ---------------------------------------------------------
@@ -24,10 +26,13 @@ class Plugin_placid extends Plugin {
 			'cache'			=>	(bool) $this->_getOption($request, 'cache', true, null, true, true),
 			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', $this->fetch('placid_defaults')['refresh'] ?: 3200),
 			'method'		=>	$this->_getOption($request, 'method', 'GET'),
+			'curl' 			=>	$this->_getOption($request, 'curl'),
 			'access_token'	=>	$this->_getOption($request, 'access_token'),
 			'query'			=>	$this->_getOption($request, 'query'),
 			'headers'		=>	$this->_getOption($request, 'headers', null)
 		);
+
+		
 
 		// We only want to try and explode the query if it's been set as a parameter,
 		// not when there is a record.
@@ -90,9 +95,18 @@ class Plugin_placid extends Plugin {
 			}
 			$options['access_token'] = $token;
 		}
-			
+
+		if($options['curl'])
+		{
+			// list($key, $value) = $options['curl'];
+			foreach($options['curl'] as $key => $value) {
+				$curlOpts[$key] = $value;
+			}
+		}
+
 		// Get the request object from the tasks
 		$request = $this->tasks->client()->request($url, $options['method']);
+
 
 		// Grab the query from the request
 		$query = $request->getQuery();
@@ -109,18 +123,20 @@ class Plugin_placid extends Plugin {
 		// Do headers exist and is it an array?
 		if($options['headers'] && is_array($options['headers']))
 		{
+
 			foreach ($options['headers'] as $key => $value)
 			{
 				$request->setHeader($key, $value);
 			}
 		}
 
+		
 		// Do we have an access token we need to append?
 		if($options['access_token'])
 		{
 			$query->set('access_token', $options['access_token']);
 		}
-
+		
 		/**
 		*	Try and get the response
 		*
@@ -128,13 +144,16 @@ class Plugin_placid extends Plugin {
 		*	- Create a log if something goes wrong, at the mo Log::warn($e->getMessage(), $meta['name'], $meta['version']) isn't working :(
 		*
 		**/
-		try
-		{
-			$response = $this->tasks->client()->send($request);
+
+		try {
+			
+			$response = $this->tasks->client()->send($request, $curlOpts);
+			
 			$result = $response->json();
 
 		} catch(\Exception  $e)
 		{
+			Log::error($e->getMessage());
 			// If an exception is thrown we set the result to null, this will help with the 'no_results' tag
 			// The error log bit should go here
 			$result = null;
@@ -150,7 +169,8 @@ class Plugin_placid extends Plugin {
 		if(!$result) {
 			return Parse::template($this->content, array('no_results' => true));
 		}
-	
+		
+
 		return $result;
 	}
 
@@ -177,7 +197,7 @@ class Plugin_placid extends Plugin {
 		return $url;
 	}
 
-	private function _getOption($request, $id, $default=NULL, $validity_check=NULL, $is_boolean=FALSE, $force_lower=TRUE)
+	private function _getOption($request, $id, $default=NULL, $validity_check=NULL, $is_boolean=FALSE, $force_lower=FALSE)
 	{
 		return isset($request[$id]) ? $request[$id] : $this->fetchParam($id, $default, $validity_check, $is_boolean, $force_lower);
 	}
