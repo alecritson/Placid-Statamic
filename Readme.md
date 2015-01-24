@@ -20,9 +20,13 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - **v0.6** - Guzzle is now being used instead of cURL
 - **v0.5.7** - Fixed issue where cache would take effect even if set to false in config
 - **v0.5.5** - Initial release
-	
+
+
 ### Installation
 Copy the placid folder to your **_add-ons** directory and you're good to go
+
+### Troubleshooting
+If you are not seeing the intended results then set `_log_enabled:` to true in your site `settings.yaml` file (line 125)
 
 ### Parameters
 - **URL**: The URL to request
