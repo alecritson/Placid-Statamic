@@ -10,6 +10,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Access tokens
  
 #### Updates / Changes
+- **v1.0.0** - Version 1, fixes and enhancements
 - **v0.9.2** - Refactoring and added [API](#api) methods
 - **v0.9** - Bug fixes, refactoring, added [default](#defaults) config and reusable [access tokens](#access_tokens)
 - **v0.8.9** - Bug fixes, refactoring and added [query](#queries) parameter
@@ -27,17 +28,17 @@ Copy the placid folder to your **_add-ons** directory and you're good to go
 - **URL**: The URL to request
 - **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
 - **handle** (string) : The handle specified in the placid config
-- **cache** (boolean) : Whether you want the request to be cached (default is true)
+- **cache** (boolean) : Whether you want the request to be cached (default is 1)
 - **method** (string) : You can set which method to use on the request, default is 'GET' 
 - **query** (string)  : Add your queries here, see [queries](#queries) for more info
-
+- **path** (string) : Add your own custom path, see [paths](#paths) for details
 
 ### Saved requests
 You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
 
 	dribbble:
 		url: 'http://api.dribbble.com/shots/everyone'
-		cache: true
+		cache: 1
 		refresh: 60
 
 	weather_api:
@@ -73,7 +74,7 @@ To use this plugin in your templates, simply use these tags:
 
 ### Example Code Block with manual URL
  
-	{{ placid url="http://api.dribbble.com/shots/everyone" cache="false" refresh="1200" }}
+	{{ placid url="http://api.dribbble.com/shots/everyone" cache="0" refresh="1200" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
@@ -95,6 +96,15 @@ You can add queries to the request from the template using a `key:value` pattern
 	{{ /placid }}
 
 which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
+
+### Paths
+You can change the request path without having to keep overwritting the url.
+
+	{{ placid handle="stripe" path="/v1/customers/{{ id }}" }}
+		{{ email }}
+	{{ /placid }}
+
+So if you have set the url to something like `https://api.stripe.com/v1/charges` in the config, it would be replaced as `https://api.stripe.com/v1/customers/123`, for example.
 
 ### Tokens
 To reuse access tokens that are stored in your config simply add the `access_token` parameter with the name of the token you want from `placid_tokens` in the placid config file

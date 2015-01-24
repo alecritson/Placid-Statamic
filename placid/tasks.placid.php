@@ -48,10 +48,13 @@ class Tasks_placid extends Tasks
 	* @return GuzzleHttp\Message\Response Object
 	**/
 	
-	public function send($request, $options = array())
+	public function send($request, $options = null)
 	{
-
-		return $this->client->get($request->getUrl(), $options);
+		if($options)
+		{
+			return $this->client->get($request->getUrl(), $options);
+		}
+		return $this->client->send($request);
 	}
 
 	// public function 

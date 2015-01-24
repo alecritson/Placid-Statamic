@@ -4,12 +4,25 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '0.9.2',
+		'version' => '1.0.0',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
-	var $options = array();
-	var $curlOpts = array();
+	var $params = array(
+		'cache',
+		'refresh',
+		'curl',	
+		'access_token',
+		'query',
+		'path',
+		'headers',
+		'url',	
+	);
+
+	var $method = 'GET';
+	var $curlOpts = null;
+	var $url = null;
+
 
 	public function index()
 	{			
@@ -19,24 +32,25 @@ class Plugin_placid extends Plugin {
 		$handle = $this->fetchParam('handle', null, null, false, false);
 		$request = $this->fetch($handle, null, null, false, false);
 
+		// Get the config from placid.yaml
+		$options = $this->fetch($handle, [], null, false, false);
+		$this->params = $this->fetchParams($this->params);		
 
-		// Set our options
-		// ---------------------------------------------------------
-		$options = array(
-			'cache'			=>	(bool) $this->_getOption($request, 'cache', true, null, true, true),
-			'cache_length'	=>	(int) $this->_getOption($request, 'refresh', $this->fetch('placid_defaults')['refresh'] ?: 3200),
-			'method'		=>	$this->_getOption($request, 'method', 'GET'),
-			'curl' 			=>	$this->_getOption($request, 'curl'),
-			'access_token'	=>	$this->_getOption($request, 'access_token'),
-			'query'			=>	$this->_getOption($request, 'query'),
-			'headers'		=>	$this->_getOption($request, 'headers', null)
-		);
+		$options = array_merge($options,array_filter($this->params));
 
-		
+		if(array_key_exists('url', $options))
+		{
+			$this->url = $options['url'];
+		}
+
+		if(!array_key_exists('refresh', $options))
+		{
+			$options['refresh'] = 500;
+		}
 
 		// We only want to try and explode the query if it's been set as a parameter,
 		// not when there is a record.
-		if($options['query'] && !$request)
+		if(array_key_exists('query', $options) && !$request)
 		{
 			// Get the query parameter as a string and explode it.
 			$queries = explode(',', $this->fetchParam('query'));
@@ -53,37 +67,8 @@ class Plugin_placid extends Plugin {
 			}
 		}
 
-		// If there is no url specified, return (figure out why throw exception wasnt working...)
-		if( ! $url = $this->_getUrl($request) ) {
-			return 'Invalid or missing URL';
-		}
-
-		// Do the cache thing
-		// ---------------------------------------------------------
-		if($options['cache'])
-		{
-			// Set up the cached_id
-			$cached_id = base64_encode(urlencode($url));
-
-			// Try and get a cached response
-			$cached_response = $this->cache->getYAML($cached_id);
-
-			if($cached_response)
-			{	
-				// If the cache is older than we want, delete it.
-				if($this->cache->getAge($cached_id) >= $options['cache_length'])
-				{
-					$this->cache->delete($cached_id);
-				}
-				else
-				{
-					return $cached_response;
-				}
-			}
-		}
-
 		// If an access token is set and there is no request we need to make sure the token exists in the config too.
-		if($options['access_token'] && !$request)
+		if(array_key_exists('access_token', $options) && !$request)
 		{
 			// Try and get the token from the config
 			try {
@@ -96,23 +81,61 @@ class Plugin_placid extends Plugin {
 			$options['access_token'] = $token;
 		}
 
-		if($options['curl'])
+
+		if(array_key_exists('curl', $options))
 		{
 			// list($key, $value) = $options['curl'];
 			foreach($options['curl'] as $key => $value) {
-				$curlOpts[$key] = $value;
+				$this->curlOpts[$key] = $value;
 			}
 		}
 
+		if(array_key_exists('method', $options))
+		{
+			$this->method = $options['method'];
+		}
+
+
 		// Get the request object from the tasks
-		$request = $this->tasks->client()->request($url, $options['method']);
+		$request = $this->tasks->client()->request($this->url, $this->method);
 
+		if(array_key_exists('path', $options))
+		{
+			$request->setPath($options['path']);
+		}
 
+		
+		// Do the cache thing
+		// ---------------------------------------------------------
+		if(array_key_exists('cache', $options) && $options['cache'])
+		{
+
+			// Set up the cached_id
+			$cached_id = base64_encode(urlencode($request->getUrl()));
+
+			// Try and get a cached response
+			$cached_response = $this->cache->getYAML($cached_id);
+
+			if($cached_response)
+			{	
+				// If the cache is older than we want, delete it.
+				if($this->cache->getAge($cached_id) >= $options['refresh'])
+				{
+					$this->cache->delete($cached_id);
+				}
+				else
+				{
+					return $cached_response;
+				}
+			}
+		}
+		
 		// Grab the query from the request
 		$query = $request->getQuery();
 
+
 		// Only do this if the query is an array
-		if($options['query'] && is_array($options['query']))
+		if(array_key_exists('query', $options)&& is_array($options['query']))
 		{
 			foreach ($options['query'] as $key => $value)
 			{
@@ -120,19 +143,18 @@ class Plugin_placid extends Plugin {
 			}
 		}
 
+		
 		// Do headers exist and is it an array?
-		if($options['headers'] && is_array($options['headers']))
+		if(array_key_exists('headers', $options) && is_array($options['headers']))
 		{
-
 			foreach ($options['headers'] as $key => $value)
 			{
 				$request->setHeader($key, $value);
 			}
 		}
 
-		
 		// Do we have an access token we need to append?
-		if($options['access_token'])
+		if(array_key_exists('access_token', $options))
 		{
 			$query->set('access_token', $options['access_token']);
 		}
@@ -146,22 +168,19 @@ class Plugin_placid extends Plugin {
 		**/
 
 		try {
-			
-			$response = $this->tasks->client()->send($request, $curlOpts);
-			
+
+			$response = $this->tasks->client()->send($request, $this->curlOpts);
 			$result = $response->json();
 
 		} catch(\Exception  $e)
 		{
-			Log::error($e->getMessage());
-			// If an exception is thrown we set the result to null, this will help with the 'no_results' tag
-			// The error log bit should go here
+			$this->log->warn($e->getMessage());
 			$result = null;
 		}
 
 		// Do we need to cache the request?
-		if($options['cache']) {	
-			$cacheId = base64_encode(urlencode($url));
+		if(array_key_exists('cache', $options)) {	
+			$cacheId = base64_encode(urlencode($request->getUrl()));
 			$this->cache->putYAML($cacheId, $result);
 		}
 
@@ -174,31 +193,13 @@ class Plugin_placid extends Plugin {
 		return $result;
 	}
 
-	/**
-    * Get the url from the tag/record
-    *                                   
-    * @param array|null      $record     The record array from config
-    *
-    * @return string   The url to request, null if empty
-    */
-	private function _getUrl($record) {
-
-		if($record) {
-			// Does the request have a url?
-			if( array_key_exists('url', $record) ) {
-				$url = $record['url'];
-			} else {
-				$url = null;
-			}
-		} else {
-			$url = $this->fetchParam('url') ?: null;
-		}
-
-		return $url;
-	}
-
-	private function _getOption($request, $id, $default=NULL, $validity_check=NULL, $is_boolean=FALSE, $force_lower=FALSE)
+	public function fetchParams($args)
 	{
-		return isset($request[$id]) ? $request[$id] : $this->fetchParam($id, $default, $validity_check, $is_boolean, $force_lower);
+		foreach($args as $arg)
+		{
+			
+			$options[$arg] = $this->fetchParam($arg, NULL, NULL, FALSE, FALSE);
+		}
+		return array_filter($options);
 	}
 }
