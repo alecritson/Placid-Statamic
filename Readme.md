@@ -26,7 +26,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 Copy the placid folder to your **_add-ons** directory and you're good to go
 
 ### Troubleshooting
-If you are not seeing the intended results then set `_log_enabled:` to true in your site `settings.yaml` file (line 125)
+If you are not seeing the intended results then make sure `_log_enabled:` is set to true in your site `settings.yaml` file (line 125). Refresh the page with the request and then look in your log files.
 
 ### Parameters
 - **URL**: The URL to request
