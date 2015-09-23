@@ -10,6 +10,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Access tokens
  
 #### Updates / Changes
+- **v1.0.2** - Fixes issue when an API returns an array and you was unable to access its values or loop it
 - **v1.0.0** - Version 1, fixes and enhancements
 - **v0.9.2** - Refactoring and added [API](#api) methods
 - **v0.9** - Bug fixes, refactoring, added [default](#defaults) config and reusable [access tokens](#access_tokens)
@@ -92,6 +93,14 @@ To use this plugin in your templates, simply use these tags:
 	{{ /placid }}
 
 *If you are unsure as to what tags to use within the placid variable pair, just pop the api url into your browser and work it out from there*
+
+If your API returns an array then Placid will automatically cast this to a `response` variable which you can loop over like:
+
+	{{ placid handle="tester" }}
+	   {{ response }}
+			{{ some.value }}
+	   {{ /response }}
+	{{ /placid }}
 
 ### Queries
 You can add queries to the request from the template using a `key:value` pattern separated by commas (`,`),  something like this:

@@ -4,7 +4,7 @@ class Plugin_placid extends Plugin {
 
 	var $meta = array(
 		'name' => 'Placid',
-		'version' => '1.0.0',
+		'version' => '1.0.2',
 		'author' => 'Alec Ritson',
 		'author_url' => 'http://www.alecritson.co.uk'
 	);
@@ -188,7 +188,11 @@ class Plugin_placid extends Plugin {
 		if(!$result) {
 			return Parse::template($this->content, array('no_results' => true));
 		}
-		
+
+		if(is_array($result))
+		{
+			return Parse::template($this->content, array('response' => $result));
+		}
 
 		return $result;
 	}
@@ -197,7 +201,6 @@ class Plugin_placid extends Plugin {
 	{
 		foreach($args as $arg)
 		{
-			
 			$options[$arg] = $this->fetchParam($arg, NULL, NULL, FALSE, FALSE);
 		}
 		return array_filter($options);
