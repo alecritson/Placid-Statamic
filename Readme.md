@@ -1,5 +1,17 @@
 # Placid Beta (Statamic)
 
+** Please note this is for use on Statamic `v2.*`, please see the v1 branch for Statamic `v1.*`  **
+
+
+_Also._
+
+I haven't had a great deal of time to delve into plugin development on the new Statamic, however I have run tests
+with this version of the plugin and things seem to work. If they don't for you then absolutely feel free to create 
+an issue on the repo, just start it with `[V2]` so I know what version you are on about.
+
+
+---
+
 Placid allows you to consume RESTful APIs in your Statamic templates, using Guzzle to handle the requests. 
 
 **Placid supports**:
@@ -10,17 +22,7 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Access tokens
  
 #### Updates / Changes
-- **v1.0.2** - Fixes issue when an API returns an array and you was unable to access its values or loop it
-- **v1.0.0** - Version 1, fixes and enhancements
-- **v0.9.2** - Refactoring and added [API](#api) methods
-- **v0.9** - Bug fixes, refactoring, added [default](#defaults) config and reusable [access tokens](#access_tokens)
-- **v0.8.9** - Bug fixes, refactoring and added [query](#queries) parameter
-- **v0.8.7** - Bug fixes
-- **v0.8** - Added support for headers to be sent from the config
-- **v0.7** - Added support for access tokens in the config
-- **v0.6** - Guzzle is now being used instead of cURL
-- **v0.5.7** - Fixed issue where cache would take effect even if set to false in config
-- **v0.5.5** - Initial release
+- **v2.0.0** - Support for the new version of Statamic
 
 
 ### Installation
@@ -31,7 +33,7 @@ If you are not seeing the intended results then make sure `_log_enabled:` is set
 
 ### Parameters
 - **URL**: The URL to request
-- **refresh** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
+- **duration** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
 - **handle** (string) : The handle specified in the placid config
 - **cache** (boolean) : Whether you want the request to be cached (default is 1)
 - **method** (string) : You can set which method to use on the request, default is 'GET' 
@@ -135,6 +137,8 @@ You can catch when there are no results just like you would in an entries loop:
 			Squirrels!
 		{{ endif }}
 	{{ /placid }}
+
+> This is a bit buggy at the moment, still looking into it.
 
 ## API
 You can utilize Placid in your own plugins via the Statamic plugin API.
