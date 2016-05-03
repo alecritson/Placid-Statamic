@@ -1,11 +1,11 @@
 # Placid Beta (Statamic)
 
-** Please note this is for use on Statamic `v2.*`, please see the v1 branch for Statamic `v1.*`  **
+**Please note this is for use on Statamic `v2.*`, please see the v1 branch for Statamic `v1.*`**
 
 
 _Also._
 
-I haven't had a great deal of time to delve into plugin development on the new Statamic, however I have run tests
+> I haven't had a great deal of time to delve into plugin development on the new Statamic, however I have run tests
 with this version of the plugin and things seem to work. If they don't for you then absolutely feel free to create 
 an issue on the repo, just start it with `[V2]` so I know what version you are on about.
 
