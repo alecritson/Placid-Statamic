@@ -86,7 +86,6 @@ class PlacidTags extends Tags
         {
             // Try and get a cached response
             $cached_response = $this->cache->get($cacheId);
-
             if($cached_response)
             {   
                 return $cached_response;
@@ -108,6 +107,7 @@ class PlacidTags extends Tags
             $response = null;
         }
         
+
         // Do we need to cache the request?
         if($options['cache']) {   
             $this->cache->put($cacheId, $response, $cacheDuration);
@@ -116,10 +116,12 @@ class PlacidTags extends Tags
         if(!$response) {
             return ['no_results' => true];
         }
-        elseif(is_array($response))
+
+        if (count($response) == count($response, COUNT_RECURSIVE)) 
         {
-            return ['response' => $response];
+            return $response;
         }
-        return json_decode($response->getBody(), true);
+        
+        return ['response' => $response];
     }
 }
