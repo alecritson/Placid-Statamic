@@ -103,30 +103,23 @@ class PlacidTags extends Tags
 
         try {
             $response = $this->api('placid')->request($options['client'], $options['path'], $method);
+            $response = json_decode($response->getBody(), true);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = null;
         }
         
         // Do we need to cache the request?
         if($options['cache']) {   
-            $this->cache->put($cacheId, json_decode($response->getBody()), $cacheDuration);
+            $this->cache->put($cacheId, $response, $cacheDuration);
         }
-
-        if(is_array($response))
-        {
-           $this->context['response'] = $response;
-        }
-
         // If there is no result, pass the `no_results` tag back
         if(!$response) {
-            $this->context['no_results'] = true;
+            return ['no_results' => true];
         }
-        else
+        elseif(is_array($response))
         {
-            return json_decode($response->getBody(), true);
+            return ['response' => $response];
         }
-
-
-        
+        return json_decode($response->getBody(), true);
     }
 }
