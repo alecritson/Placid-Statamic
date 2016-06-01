@@ -26,10 +26,8 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 
 
 ### Installation
-Copy the placid folder to your **_add-ons** directory and you're good to go
+Copy the `Placid` folder to your **site/addons** directory and you're good to go
 
-### Troubleshooting
-If you are not seeing the intended results then make sure `_log_enabled:` is set to true in your site `settings.yaml` file (line 125). Refresh the page with the request and then look in your log files.
 
 ### Parameters
 - **URL**: The URL to request
@@ -41,7 +39,7 @@ If you are not seeing the intended results then make sure `_log_enabled:` is set
 - **path** (string) : Add your own custom path, see [paths](#paths) for details
 
 ### Saved requests
-You can set up requests for placid in **_config/add-ons/placid.yaml** like so:
+You can set up requests for placid in **site/settings/addons/placid.yaml** like so:
 
 	dribbble:
 		url: 'http://api.dribbble.com/shots/everyone'
@@ -81,14 +79,14 @@ To use this plugin in your templates, simply use these tags:
 
 ### Example Code Block with manual URL
  
-	{{ placid url="http://api.dribbble.com/shots/everyone" cache="0" refresh="1200" }}
+	{{ placid:request url="http://api.dribbble.com/shots/everyone" cache="0" refresh="1200" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
 	{{ /placid }}
 
 ### Example code block with handle
-	{{ placid handle="dribbble" }}
+	{{ placid:request handle="dribbble" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
@@ -98,7 +96,7 @@ To use this plugin in your templates, simply use these tags:
 
 If your API returns an array then Placid will automatically cast this to a `response` variable which you can loop over like:
 
-	{{ placid handle="tester" }}
+	{{ placid:request handle="tester" }}
 	   {{ response }}
 			{{ some.value }}
 	   {{ /response }}
@@ -107,7 +105,7 @@ If your API returns an array then Placid will automatically cast this to a `resp
 ### Queries
 You can add queries to the request from the template using a `key:value` pattern separated by commas (`,`),  something like this:
 
-	{{ placid handle="feed" query="posts:5,limit:4" }}
+	{{ placid:request handle="feed" query="posts:5,limit:4" }}
 	{{ /placid }}
 
 which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
@@ -115,7 +113,7 @@ which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
 ### Paths
 You can change the request path without having to keep overwritting the url.
 
-	{{ placid handle="stripe" path="/v1/customers/{{ id }}" }}
+	{{ placid:request handle="stripe" path="/v1/customers/{{ id }}" }}
 		{{ email }}
 	{{ /placid }}
 
@@ -124,13 +122,13 @@ So if you have set the url to something like `https://api.stripe.com/v1/charges`
 ### Tokens
 To reuse access tokens that are stored in your config simply add the `access_token` parameter with the name of the token you want from `placid_tokens` in the placid config file
 
-	{{ placid handle="githubRepo" access_token="github" }}
+	{{ placid:request handle="githubRepo" access_token="github" }}
 	{{ /placid }}	
 
 ### Handling no results
 You can catch when there are no results just like you would in an entries loop:
 
-	{{ placid url="http://www.dustysquirrels.com/noapi" }}
+	{{ placid:request url="http://www.dustysquirrels.com/noapi" }}
 		{{ if no_results }}
 			No results
 		{{ else }}
