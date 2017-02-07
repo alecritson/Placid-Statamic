@@ -101,7 +101,7 @@ class PlacidTags extends Tags
 
 
         try {
-            $response = $this->api('placid')->request($options['client'], $options['path'], $method);
+            $response = $this->api('Placid')->request($options['client'], $options['path'], $method);
             $response = json_decode($response->getBody(), true);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = null;
