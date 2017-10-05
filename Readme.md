@@ -1,5 +1,7 @@
 # Placid Beta (Statamic)
 
+[![StyleCI](https://styleci.io/repos/25640354/shield?branch=v2)](https://styleci.io/repos/25640354)
+
 **Please note this is for use on Statamic `v2.*`, please see the v1 branch for Statamic `v1.*`**
 
 
