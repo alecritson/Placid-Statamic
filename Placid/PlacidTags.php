@@ -79,6 +79,8 @@ class PlacidTags extends Tags
             $options['client']['query']['access_token'] = $options['access_token'];
         }
 
+        $options['client']['query'] = $options['query'];
+
         try {
             $response = $this->api('Placid')->request($options['client'], $options['path'], $method);
             $response = json_decode($response->getBody(), true);
