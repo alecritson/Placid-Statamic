@@ -85,14 +85,14 @@ To use this plugin in your templates, simply use these tags:
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 ### Example code block with handle
 	{{ placid:request handle="dribbble" }}
 		{{ shots }}
 		 {{ title }}
 		{{ /shots }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 *If you are unsure as to what tags to use within the placid variable pair, just pop the api url into your browser and work it out from there*
 
@@ -102,13 +102,13 @@ If your API returns an array then Placid will automatically cast this to a `resp
 	   {{ response }}
 			{{ some.value }}
 	   {{ /response }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 ### Queries
 You can add queries to the request from the template using a `key:value` pattern separated by commas (`,`),  something like this:
 
 	{{ placid:request handle="feed" query="posts:5,limit:4" }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
 
@@ -117,7 +117,7 @@ You can change the request path without having to keep overwritting the url.
 
 	{{ placid:request handle="stripe" path="/v1/customers/{{ id }}" }}
 		{{ email }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 So if you have set the url to something like `https://api.stripe.com/v1/charges` in the config, it would be replaced as `https://api.stripe.com/v1/customers/123`, for example.
 
@@ -125,7 +125,7 @@ So if you have set the url to something like `https://api.stripe.com/v1/charges`
 To reuse access tokens that are stored in your config simply add the `access_token` parameter with the name of the token you want from `placid_tokens` in the placid config file
 
 	{{ placid:request handle="githubRepo" access_token="github" }}
-	{{ /placid }}	
+	{{ /placid:request }}	
 
 ### Handling no results
 You can catch when there are no results just like you would in an entries loop:
@@ -136,7 +136,7 @@ You can catch when there are no results just like you would in an entries loop:
 		{{ else }}
 			Squirrels!
 		{{ endif }}
-	{{ /placid }}
+	{{ /placid:request }}
 
 > This is a bit buggy at the moment, still looking into it.
 
