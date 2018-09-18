@@ -70,7 +70,10 @@ class PlacidTags extends Tags
             // Try and get a cached response
             $cached_response = $this->cache->get($cacheId);
             if ($cached_response) {
-                return $cached_response;
+                if (count($cached_response) == count($cached_response, COUNT_RECURSIVE)) {
+                    return $cached_response;
+                }
+                return ['response' => $cached_response];
             }
         }
 
