@@ -34,19 +34,19 @@ composer require ritson/placid-statamic
 You can set up requests for placid in **resources/placid/requests** like so:
 
 ``` yaml
-	// resources/placid/requests/placeholder.yaml
-	host: https://jsonplaceholder.typicode.com
-	method: GET
-	path: posts/:id
-	auth: placeholder // See Authentication section
-	segments:
-		id: 1
-	headers:
-		accept: application/json
-	query:
-		foo: bar
-	formParams:
-		foo: bar
+// resources/placid/requests/placeholder.yaml
+host: https://jsonplaceholder.typicode.com
+method: GET
+path: posts/:id
+auth: placeholder // See Authentication section
+segments:
+	id: 1
+headers:
+	accept: application/json
+query:
+	foo: bar
+formParams:
+	foo: bar
 ```
 		
 #### Authentication
