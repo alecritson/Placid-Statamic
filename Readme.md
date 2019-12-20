@@ -1,16 +1,6 @@
-# Placid Beta (Statamic)
+# Placid Statamic
 
 [![StyleCI](https://styleci.io/repos/25640354/shield?branch=v2)](https://styleci.io/repos/25640354)
-
-**Please note this is for use on Statamic `v2.*`, please see the v1 branch for Statamic `v1.*`**
-
-
-_Also._
-
-> I haven't had a great deal of time to delve into plugin development on the new Statamic, however I have run tests
-with this version of the plugin and things seem to work. If they don't for you then absolutely feel free to create 
-an issue on the repo, just start it with `[V2]` so I know what version you are on about.
-
 
 ---
 
@@ -22,138 +12,89 @@ Placid allows you to consume RESTful APIs in your Statamic templates, using Guzz
 - Predefined requests
 - Headers
 - Access tokens
- 
-#### Updates / Changes
-- **v2.0.0** - Support for the new version of Statamic
-
 
 ### Installation
-Copy the `Placid` folder to your **site/addons** directory and you're good to go
 
+Require the addon via composer
+
+```
+composer require ritson/placid-statamic
+```
 
 ### Parameters
-- **URL**: The URL to request
-- **duration** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
-- **handle** (string) : The handle specified in the placid config
-- **cache** (boolean) : Whether you want the request to be cached (default is 1)
+- **host**: The API host
+- **cache** (number): The time in seconds until the cache refreshes (default is 7200 / 2 hours)
+- **handle** (string) : The handle of the resource to use
 - **method** (string) : You can set which method to use on the request, default is 'GET' 
 - **query** (string)  : Add your queries here, see [queries](#queries) for more info
 - **path** (string) : Add your own custom path, see [paths](#paths) for details
+- **auth** (string) : Handle for the auth scheme to use
 
 ### Saved requests
-You can set up requests for placid in **site/settings/addons/placid.yaml** like so:
+You can set up requests for placid in **resources/placid/requests** like so:
 
-	dribbble:
-		url: 'http://api.dribbble.com/shots/everyone'
-		cache: 1
-		refresh: 60
-
-	weather_api:
-		url: 'http://api.openweathermap.org/data/2.5/weather'
-		query:
-			q: 'London,uk'
-
-	github:
-		url: 'https://api.github.com/repos/alecritson/Placid-Statamic'
-		access_token: OAUTH-TOKEN
-		headers:
-			Authorization: token OAUTH-TOKEN
-
-The query array works out as `q=London,uk` in the url
-
-**If you use `access_token` it will be appended to the url, if you use the `headers` array then it will be sent through the request headers.**
-
-### Defaults
-You can specify default config values for Placid to use
-
-	placid_defaults:
-		refresh: 1000
+``` yaml
+	// resources/placid/requests/placeholder.yaml
+	host: https://jsonplaceholder.typicode.com
+	method: GET
+	path: posts/:id
+	auth: placeholder // See Authentication section
+	segments:
+		id: 1
+	headers:
+		accept: application/json
+	query:
+		foo: bar
+	formParams:
+		foo: bar
+```
 		
-#### Access tokens
-You can define access tokens in the config so you can use them in your templates without having to re enter them for every request, they look like this in the config:
+#### Authentication
+You can define authorisation schemes to use and reuse on your requests. You define them in **resources/placid/auth** like so:
 
-	placid_tokens:
-		github: SOME-ACCESS-TOKEN
+``` yaml
+// resources/placid/auth/placeholder.yaml
+headers:
+  Authorization: Bearer :token
+token: services.api.token
+```
+
+The above will send the token through the headers, you define your tokens in your config and reference as you would any Laravel config item.
+
+If you need to send your access token through the query string, define your auth scheme like so:
+
+``` yaml
+// resources/placid/auth/placeholder.yaml
+query:
+  access_token: :token
+token: services.api.token
+```
+
+The query string and headers will be merged with any that are already present on the request
 
 ## Usage
 
 To use this plugin in your templates, simply use these tags:
 
-### Example Code Block with manual URL
+### Basic example
  
-	{{ placid:request url="http://api.dribbble.com/shots/everyone" cache="0" refresh="1200" }}
-		{{ shots }}
-		 {{ title }}
-		{{ /shots }}
-	{{ /placid:request }}
+```
+{{ placid handle="placeholder" }}
+  {{ response.data }}
+    <h1>{{ title }}</h1>
+  {{ /response.data }}
+{{ /placid }}
+```
 
-### Example code block with handle
-	{{ placid:request handle="dribbble" }}
-		{{ shots }}
-		 {{ title }}
-		{{ /shots }}
-	{{ /placid:request }}
+### Full example
 
-*If you are unsure as to what tags to use within the placid variable pair, just pop the api url into your browser and work it out from there*
-
-If your API returns an array then Placid will automatically cast this to a `response` variable which you can loop over like:
-
-	{{ placid:request handle="tester" }}
-	   {{ response }}
-			{{ some.value }}
-	   {{ /response }}
-	{{ /placid:request }}
-
-### Queries
-You can add queries to the request from the template using a `key:value` pattern separated by commas (`,`),  something like this:
-
-	{{ placid:request handle="feed" query="posts:5,limit:4" }}
-	{{ /placid:request }}
-
-which will work out something like: `http://someapi.co.uk/feed?posts=5&limit=4`
-
-### Paths
-You can change the request path without having to keep overwritting the url.
-
-	{{ placid:request handle="stripe" path="/v1/customers/{{ id }}" }}
-		{{ email }}
-	{{ /placid:request }}
-
-So if you have set the url to something like `https://api.stripe.com/v1/charges` in the config, it would be replaced as `https://api.stripe.com/v1/customers/123`, for example.
-
-### Tokens
-To reuse access tokens that are stored in your config simply add the `access_token` parameter with the name of the token you want from `placid_tokens` in the placid config file
-
-	{{ placid:request handle="githubRepo" access_token="github" }}
-	{{ /placid:request }}	
-
-### Handling no results
-You can catch when there are no results just like you would in an entries loop:
-
-	{{ placid:request url="http://www.dustysquirrels.com/noapi" }}
-		{{ if no_results }}
-			No results
-		{{ else }}
-			Squirrels!
-		{{ endif }}
-	{{ /placid:request }}
-
-> This is a bit buggy at the moment, still looking into it.
-
-## API
-You can utilize Placid in your own plugins via the Statamic plugin API.
-
-### Request 
-
-	$request = $this->addon->api('placid')->request($url)
-	
-This will return a `GuzzleHttp\Message\Request Object` which you can interact with, read the [Guzzle docs](http://guzzle.readthedocs.org/en/latest/http-messages.html#requests) for more info. If you need a different method to `GET` then just pass it in the second parameter.
-
-### Send  
-
-	$response = $this->addon->api('placid')->send($request)
-	
-This will send the request and return a `GuzzleHttp\Message\Response Object`, again you can interact with this but if you just want to get the response content you could just do `$response->json()`, check the [Guzzle docs](http://guzzle.readthedocs.org/en/latest/http-messages.html#responses) for more info.
+```
+{{ placid host="https://jsonplaceholder.typicode.com" path=":part/:id" cache="60" query="foo:bar|bar:baz" segments="part:posts|id:1" headers="foo:bar" }}
+  {{ response.data }}
+    <h1>{{ title }}</h1>
+  {{ /response.data }}
+{{ /placid }}
+```
 
 ## Support,issues,feedback
 If you want to leave feedback about this project, feel free to get in touch on [twitter](http://www.twitter.com/alecritson) if you experience any issues please just create a new issue here on the Repo

@@ -1,3 +1,4 @@
 placid/composer.json
 placid/composer.lock
 placid/composer.phar
+/vendor/

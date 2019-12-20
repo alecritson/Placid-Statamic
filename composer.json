@@ -1,0 +1,29 @@
+{
+    "name": "ritson/placid-statamic",
+    "description": "Consume RESTful APIs in your Statamic templates",
+    "type": "statamic-addon",
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "statamic/cms": "3.0.*@beta"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alec Ritson",
+            "email": "hello@itsalec.co.uk"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Ritson\\Placid\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ritson\\Placid\\PlacidServiceProvider"
+            ]
+        }
+    }
+}
