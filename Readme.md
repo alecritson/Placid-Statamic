@@ -40,13 +40,13 @@ method: GET
 path: posts/:id
 auth: placeholder // See Authentication section
 segments:
-	id: 1
+  id: 1
 headers:
-	accept: application/json
+  accept: application/json
 query:
-	foo: bar
+  foo: bar
 formParams:
-	foo: bar
+  foo: bar
 ```
 		
 #### Authentication
