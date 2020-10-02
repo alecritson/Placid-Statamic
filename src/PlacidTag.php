@@ -2,7 +2,6 @@
 
 namespace Ritson\Placid;
 
-use Exception;
 use Ritson\Placid\PlacidRepository;
 use Ritson\Placid\PlacidResource;
 use Statamic\Tags\Tags;
@@ -20,8 +19,6 @@ class PlacidTag extends Tags
     {
         return $this->request();
     }
-    
-    // protected function get
 
     /**
      * The {{ placid:example }} tag.
@@ -30,18 +27,18 @@ class PlacidTag extends Tags
      */
     public function request()
     {
-        $handle = $this->getParam('handle', null);
+        $handle = $this->params->get('handle');
 
         $options = [
-            'host' => $this->getParam('host', null),
-            'headers' => $this->getParam('headers', null),
-            'path' => $this->getParam('path', null),
-            'cache' => $this->getParam('cache', null),
-            'method' => $this->getParam('method', null),
-            'segments' => $this->getParam('segments', null),
-            'url' => $this->getParam('url', null),
-            'query' => $this->getParam('query', null),
-            'auth' => $this->getParam('auth', null)
+            'host' => $this->params->get('host', null),
+            'headers' => $this->params->get('headers', null),
+            'path' => $this->params->get('path', null),
+            'cache' => $this->params->get('cache', null),
+            'method' => $this->params->get('method', null),
+            'segments' => $this->params->get('segments', null),
+            'url' => $this->params->get('url', null),
+            'query' => $this->params->get('query', null),
+            'auth' => $this->params->get('auth', null)
         ];
 
         if ($handle) {
