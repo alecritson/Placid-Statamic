@@ -3,8 +3,8 @@
     "description": "Consume RESTful APIs in your Statamic templates",
     "type": "statamic-addon",
     "require": {
-        "guzzlehttp/guzzle": "~6.0",
-        "statamic/cms": "3.0.*@beta"
+        "guzzlehttp/guzzle": "^6.3 || ^7.0",
+        "statamic/cms": "^3.1"
     },
     "license": "MIT",
     "authors": [
@@ -20,6 +20,10 @@
         }
     },
     "extra": {
+        "statamic": {
+            "name": "Placid",
+            "description": "Consume REST API's in your templates."
+        },
         "laravel": {
             "providers": [
                 "Ritson\\Placid\\PlacidServiceProvider"

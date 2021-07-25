@@ -54,6 +54,11 @@ class PlacidResource extends AbstractResource
     protected $auth = null;
 
     /**
+     * The full URL to use for the request
+     */
+    protected $url = null;
+
+    /**
      * Set the value for access token
      * @param String $value
      */
@@ -147,7 +152,7 @@ class PlacidResource extends AbstractResource
 
         if ($this->cache && !$this->auth) {
             return Cache::remember($this->getCacheKey(), $this->cache, function () {
-                $response = $this->client()->request($this->method, $this->path);
+                $response = $this->client()->request($this->method, $this->url ?? $this->path);
                 return (new PlacidResponse)->resolve($response);
             });
         }
@@ -156,7 +161,7 @@ class PlacidResource extends AbstractResource
         $this->prepareAuth();
 
         try {
-            $response = $this->client()->request($this->method, $this->path);
+            $response = $this->client()->request($this->method, $this->url ?? $this->path);
             return (new PlacidResponse)->resolve($response);
         } catch (RequestException $e) {
             return (new PlacidResponse)->resolve($e->getResponse() ?? $e);
@@ -166,7 +171,7 @@ class PlacidResource extends AbstractResource
     protected function getCacheKey()
     {
         return base64_encode(
-            urlencode($this->host . $this->path . implode('&', $this->query))
+            urlencode($this->url ?? ($this->host . $this->path . implode('&', $this->query)))
         );
     }
 }
