@@ -17,8 +17,6 @@ class Placid extends Tags
     {
         return $this->request();
     }
-    
-    // protected function get
 
     /**
      * The {{ placid:example }} tag.
